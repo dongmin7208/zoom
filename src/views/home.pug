@@ -6,9 +6,18 @@ html(lang="en")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
         title Noom
         link(rel="stylesheet", href="https://unpkg.com/mvp.css")
-    body 
-    header 
-        h1 It works!ddd
-    main
-        h2 welcome to Noom
-        script(src="/public/js/app.js")
+    body
+        header
+            h1 Noom
+        main
+            h2 Welcome to Noom
+            form
+                input(placeholder="room name", required, type="text")
+                input(placeholder="Nickname", required, type="text")
+                button Enter go room
+            div#call
+                div#myStream
+                    video#myFace(autoplay,playsinline, width="400",height="400")
+                    
+        script(src="/socket.io/socket.io.js")
+        script(src="/public/app.js") 
