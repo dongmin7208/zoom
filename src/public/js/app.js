@@ -1,38 +1,44 @@
 // Put all your frontend code here.
-import WebSocket from "ws";
+const socket = new WebSocket(`ws://${window.location.host}`);
 const messageList = document.querySelector("ul");
-const messageForm = document.querySelector("form");
+const messageForm = document.querySelector("#message");
 const nickForm = document.querySelector("#nick");
+
+function makeMessage(type, payload) {
+    const msg = { type, payload };
+    return JSON.stringify(msg);
+}
 
 function handleOpen() {
     console.log("connected to Server!");
 }
 
-WebSocket.addEventListener("open", handleOpen);
+socket.addEventListener("open", handleOpen);
 
-WebSocket.addEventListener("message", (message) => {
+socket.addEventListener("message", (message) => {
     const li = document.createElement("li");
     li.innerText = message.data;
     messageList.append(li);
-    console.log("New message: ", message.data);
+    // console.log("New message: ", message.data);
 });
 
-WebSocket.addEventListener("close", () => {
+socket.addEventListener("close", () => {
     console.log("Disconnected from Server! ");
 });
 
 function handleSubmit(event) {
     event.preventDefault();
     const input = messageForm.querySelector("input");
-    WebSocket.send(input.value);
+    socket.send(makeMessage("new_message", input.value));
     input.value = "";
 }
 
 function handleNickSubmit(event) {
     event.preventDefault();
     const input = nickForm.querySelector("input");
-    WebSocket.send(makeMessage("nickname", input.value));
+    socket.send(makeMessage("nickname", input.value));
     input.value = "";
 }
 
 messageForm.addEventListener("submit", handleSubmit);
+nickForm.addEventListener("submit", handleNickSubmit);

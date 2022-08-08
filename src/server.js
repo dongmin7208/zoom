@@ -14,12 +14,28 @@ const handleListen = () => console.log(`Listening on http://localhost:3000`);
 
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
-wss.on("connection", (live) => {
-    live.on("join_room", (roomName, name) => {
-        live.set("name", name);
-        live.join(roomName);
-        live.to(roomName).emit("hello welcome");
+function onSocketClose() {
+    console.log("close brower");
+}
+const sockets = [];
+
+wss.on("connection", (socket) => {
+    sockets.push(socket);
+    socket["nickname"] = "Anon";
+    console.log("Connected to Browser ✅");
+    socket.on("close", onSocketClose);
+    socket.on("message", (msg) => {
+        const message = JSON.parse(msg);
+        switch (message.type) {
+            case "new_message":
+                sockets.forEach((aSocket) =>
+                    aSocket.send(`${socket.nickname}: ${message.payload}`)
+                );
+            case "nickname":
+                socket["nickname"] = message.payload;
+        }
     });
 });
+
 // Put all your backend code here.
-app.listen(3000, handleListen);
+server.listen(3000, handleListen);
