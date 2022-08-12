@@ -4,10 +4,51 @@ const welcom = document.getElementById("welcome");
 const form = welcom.querySelector("form");
 const room = document.getElementById("room");
 const roomList = document.getElementById("roomList");
-
+const myFace = document.getElementById("myFace");
+const muteBtn = document.getElementById("mute");
+const cameraBtn = document.getElementById("camera");
 room.hidden = true;
 
 let roomName;
+let myStream;
+let muted = false;
+let cameraOff = false;
+
+function handleMuteClick() {
+    console.log(myStream.getAudioTrack());
+    if (!muted) {
+        muteBtn.innerText = "Unmute";
+        muted = true;
+    } else {
+        muteBtn.innerText = "Mute";
+        muted = false;
+    }
+}
+
+function handleCameraClick() {
+    if (cameraOff) {
+        cameraBtn.innerText = "Turncamera off";
+        cameraOff = false;
+    } else {
+        cameraBtn.innerText = "Turn camera on!";
+        cameraOff = true;
+    }
+}
+async function getMedia() {
+    try {
+        myStream = await navigator.mediaDevices.getUserMedia({
+            audio: false,
+            video: true,
+        });
+        myFace.srcObject = myStream;
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+getMedia();
+muteBtn.addEventListener("click", handleMuteClick);
+cameraBtn.addEventListener("click", handleCameraClick);
 
 function addMessage(message) {
     const ul = room.querySelector("ul");
