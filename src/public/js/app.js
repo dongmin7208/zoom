@@ -57,22 +57,18 @@ function handleRoomSubmit(event) {
 }
 
 function displayRooms(currentRooms) {
+    welcome.querySelector("ul").innerHTML = "";
     const rooms = welcome.querySelector("ul");
-    console.log("currentRooms: ", currentRooms);
-    if (currentRooms && currentRooms.length > 0) {
-        if (
-            rooms.getElementsByTagName("li").length === 0 ||
-            rooms.getElementsByTagName("li").length !== currentRooms.length
-        ) {
-            console.log("here");
-            currentRooms.forEach(renderProductList);
+    //delete lis in rooms
 
-            function renderProductList(element, index, arr) {
-                var li = document.createElement("li");
-                li.setAttribute("class", "item");
-                rooms.appendChild(li);
-                li.innerHTML = li.innerHTML + element;
-            }
+    if (currentRooms && currentRooms.length > 0) {
+        currentRooms.forEach(renderProductList);
+
+        function renderProductList(element, index, arr) {
+            var li = document.createElement("li");
+            li.setAttribute("class", "item");
+            rooms.appendChild(li);
+            li.innerHTML = li.innerHTML + element;
         }
     }
 }
