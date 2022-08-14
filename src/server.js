@@ -12,7 +12,7 @@ app.get("/*", (_, res) => res.redirect("/"));
 
 const httpServer = http.createServer(app);
 const wsServer = SocketIO(httpServer);
-let roomList = [];
+const current_rooms = [];
 
 function publicRooms() {
     const {
@@ -34,26 +34,14 @@ function countRoom(roomName) {
 }
 
 wsServer.on("connection", (socket) => {
-    socket["nickname"] = "Anon";
+    socket["nickname"] = "Anonymous";
     socket.onAny((event) => {
         console.log(`Socket Event: ${event}`);
-
-        wsServer.sockets.emit("show_rooms", roomList);
+        wsServer.sockets.emit("show_rooms", current_rooms);
     });
     socket.on("enter_room", (roomName, done) => {
-        // 엔터룸 들어왔을때 룸리스트를 만들겠다.
-        // 룸리스트 안에 같은 방이름이 존재하지 않게하기위함.
-        // 룸리스트 안에 룸이름을 넣는데 같은 룸이름이 없다면 넣어라
-        //
-
-        let exist = false;
-        for (let i = 0; i < roomList.length; i++) {
-            if (roomList[i] === roomName) {
-                exist = true;
-            }
-        }
-        if (!exist) {
-            roomList.push(roomName);
+        if (!current_rooms.includes(roomName)) {
+            current_rooms.push(roomName);
         }
         socket.join(roomName);
         done();
@@ -62,18 +50,14 @@ wsServer.on("connection", (socket) => {
             .emit("welcome", socket.nickname, countRoom(roomName));
         wsServer.sockets.emit("room_change", publicRooms());
     });
+    socket.on("enter_nickname", (nickname) => {
+        socket["nickname"] = nickname;
+    });
     socket.on("disconnecting", () => {
         socket.rooms.forEach((room) =>
             socket.to(room).emit("bye", socket.nickname, countRoom(room) - 1)
         );
     });
-
-    socket.on("roomList", () => {
-        socket.rooms.forEach((roomList) =>
-            socket.to(roomList).emit("roomList", socket.roomName)
-        );
-    });
-
     socket.on("disconnect", () => {
         wsServer.sockets.emit("room_change", publicRooms());
     });
@@ -81,29 +65,21 @@ wsServer.on("connection", (socket) => {
         socket.to(room).emit("new_message", `${socket.nickname}: ${msg}`);
         done();
     });
-    socket.on("nickname", (nickname) => (socket["nickname"] = nickname));
+    socket.on("join_room", (roomName, done) => {
+        socket.join(roomName);
+        done();
+        socket.to(roomName).emit("welcome");
+    });
+    socket.on("offer", (offer, roomName) => {
+        socket.to(roomName).emit("offer", offer);
+    });
+    socket.on("answer", (answer, roomName) => {
+        socket.to(roomName).emit("answer", answer);
+    });
+    socket.on("ice", (ice, roomName) => {
+        socket.to(roomName).emit("ice", ice);
+    });
 });
-
-/*
-const wss = new WebSocket.Server({ server });
-const sockets = [];
-wss.on("connection", (socket) => {
-  sockets.push(socket);
-  socket["nickname"] = "Anon";
-  console.log("Connected to Browser ✅");
-  socket.on("close", onSocketClose);
-  socket.on("message", (msg) => {
-    const message = JSON.parse(msg);
-    switch (message.type) {
-      case "new_message":
-        sockets.forEach((aSocket) =>
-          aSocket.send(`${socket.nickname}: ${message.payload}`)
-        );
-      case "nickname":
-        socket["nickname"] = message.payload;
-    }
-  });
-}); */
 
 const handleListen = () => console.log(`Listening on http://localhost:3000`);
 httpServer.listen(3000, handleListen);

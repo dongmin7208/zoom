@@ -8,31 +8,39 @@ html(lang="en")
         meta(charset="UTF-8")
         meta(http-equiv="X-UA-Compatible", content="IE=edge")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
-        title Noom
+        title Zoom
         link(rel="stylesheet", href="https://unpkg.com/mvp.css")
     body
         header
-            h1 Noom
+            h1 Zoom
         main
-            div#welcome
-                form
-                    input(placeholder="room name", required, type="text")
-                    button Enter Room
-                h4 Open Rooms:
-                ul
-            div#room
-                h3
-                ul
-                form#msg
-                    input(placeholder="message", required, type="text")
-                    button Send
+        div#nickname
+            form
+                input(placeholder="nickname", required, type="text")
+                button Enter Nickname
+        br
+        div#welcome
+            form
+                input(placeholder="room name", required, type="text")
+                button Enter Room
+            h4 Open Rooms:
+            ul
+        div#leave
+            form#leave-button
+                button Leave Chatroom
+        div#room
+            h3
+            ul
+            form#msg
+                input(placeholder="message", required, type="text")
+                button Send
+        div#call
             div#myStream
-                video#myFace(autoplay,playsinline, width="400", height="400")
+                video#myFace(autoplay,playsinline,  width="400", height="400")
                 button#mute mute
-                button#camera camera
+                button#camera camera       
                 select#cameras
                     option(value="device") Face Camera 
-            div#roomList
-                    div
+                    video#peerFace(autoplay,playsinline, width="400", height="400")
         script(src="/socket.io/socket.io.js") 
         script(src="/public/js/app.js") 
