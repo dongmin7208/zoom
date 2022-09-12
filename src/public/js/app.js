@@ -50,11 +50,11 @@ function noJoin() {
 async function getMedia(deviceId) {
     const initialConstrains = {
         audio: true,
-        video: { facingMode: "user" },
+        video: { facingMode: "user" }
     };
     const cameraConstraints = {
         audio: true,
-        video: { deviceId: { exact: deviceId } },
+        video: { deviceId: { exact: deviceId } }
     };
     try {
         myStream = await navigator.mediaDevices.getUserMedia(
@@ -62,7 +62,7 @@ async function getMedia(deviceId) {
         );
         myFace.srcObject = myStream;
         if (!deviceId) {
-            await getCameras();
+            // await getCameras();
         }
     } catch (e) {
         console.log(e);
